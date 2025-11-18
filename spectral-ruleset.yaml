@@ -1,0 +1,672 @@
+extends:
+  - spectral:oas
+
+functions:
+  - oasDocumentOrder
+  - pathPropertiesOrder
+  - requestBodyNamingPattern
+  - hasXCorrelationId
+  - responseNamingPattern
+  - componentOrder
+  - sortedAlphabetically
+
+rules:
+  contact-properties: false
+  duplicated-entry-in-enum: false
+  info-contact: true
+  info-description: false
+  info-license: false
+  info-version: true
+  info-version-semver: true
+  license-url: false
+  no-$ref-siblings: false
+  no-empty-servers: false
+  no-eval-in-markdown: false
+  no-invalid-media-type-examples: true
+  no-path-trailing-slash: false
+  no-script-tags-in-markdown: false
+  oas-example-valid-media: true
+  oas-example-value-or-externalValue: false
+  oas3-api-servers: false
+  oas3-examples-value-or-externalValue: false
+  oas3-operation-security-defined: true
+  oas3-parameter-description: true
+  oas3-request-body: true
+  oas3-schema: true
+  oas3-schema-circular: true
+  oas3-schema-description: false
+  oas3-schema-examples: false
+  oas3-schema-required-properties: true
+  oas3-server-not-example.com: false
+  oas3-server-trailing-slash: false
+  oas3-server-variables: false
+  oas3-unused-component: true
+  oas3-unused-example: false
+  oas3-valid-content-example: true
+  oas3-valid-media-example: true
+  oas3-valid-schema-example: false
+  openapi-tags: false
+  openapi-tags-alphabetical: false
+  operation-description: true
+  operation-operationId: true
+  operation-operationId-unique: true
+  operation-operationId-valid-in-url: true
+  operation-parameters: true
+  operation-security: true
+  operation-singular-tag: true
+  operation-success-response: true
+  operation-summary: false
+  operation-tag-defined: true
+  operation-tags: true
+  operation-tags-resolved: true
+  path-declarations-must-exist: true
+  path-keys-no-trailing-slash: false
+  path-not-include-query: false
+  path-params: true
+  responses-2xx-schema: true
+  responses-have-description: false
+  schema-invalid-json: true
+  schema-typed-array: true
+  schema-typed-enum: false
+  servers-matches: false
+  tag-described: false
+  tag-description: false
+  typed-enum: false
+
+  IGNITIA001:
+    description: |
+      IGNITIA001: OAS3 document order must be:
+        - openapi
+        - info
+        - servers (optional)
+        - security (optional)
+        - tags
+        - paths
+        - components
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$"
+    then:
+      function: oasDocumentOrder
+  IGNITIA002A:
+    description: "IGNITIA002A: The 'info' section must have a title."
+    severity: error
+    formats: [oas3]
+    given: $.info
+    then:
+      - field: "title"
+        function: truthy
+  IGNITIA002B:
+    description: "IGNITIA002B: The value 'info.title' must be kebab-case (^[a-z0-9]+(?:-[a-z0-9]+)*$)"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.info.title"
+    then:
+      function: pattern
+      functionOptions:
+        match: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+
+  IGNITIA002C:
+    description: "IGNITIA002C: The field 'info.description' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.info
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA002D:
+    description: "IGNITIA002D: The field 'info.version' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.info
+    then:
+      - field: "version"
+        function: truthy
+
+  IGNITIA003A:
+    description: "IGNITIA003A: The field 'tags.name' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.tags.*
+    then:
+      - field: "name"
+        function: truthy
+
+  IGNITIA003B:
+    description: "IGNITIA003B: The field 'tags.description' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.tags.*
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA004A:
+    description: "IGNITIA004A: The field 'paths.*.description' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths.*.*
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA004B:
+    description: "IGNITIA004B: The field 'paths.*.tag' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths.*.*
+    then:
+      - field: "tags"
+        function: truthy
+
+  IGNITIA004C:
+    description: "IGNITIA004C: The field 'paths.*.summary' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths.*.*
+    then:
+      - field: "summary"
+        function: truthy
+
+  IGNITIA004D:
+    description: "IGNITIA004D: The field 'paths.*.operationId' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths.*.*
+    then:
+      - field: "operationId"
+        function: truthy
+
+  IGNITIA004E:
+    description: "IGNITIA004D: The field 'paths.*.responses' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths.*.*
+    then:
+      - field: "responses"
+        function: truthy
+
+  IGNITIA004F:
+    description: |
+      IGNITIA004F: The contents of 'paths.*' must be in the following order:
+        - tags
+        - summary
+        - description
+        - operationId
+        - parameters (optional)
+        - requestBody (optional)
+        - responses
+        - Other (like 'x-codegen-request-body-name')
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.paths.*.*"
+    then:
+      function: pathPropertiesOrder
+
+  IGNITIA004G:
+    description: |
+      IGNITIA004G: Paths must have a reference ($ref) to it's parameters.
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths..parameters[*]
+    then:
+      - field: $ref
+        function: truthy
+
+  IGNITIA004H:
+    description: |
+      IGNITIA004H: Paths must have a reference ($ref) to it's requestBody.
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths..requestBody[*]
+    then:
+      - field: $ref
+        function: truthy
+
+  IGNITIA004I:
+    description: |
+      IGNITIA004I: Paths must have a reference ($ref) to it's responses.
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.paths..responses[*]
+    then:
+      - field: $ref
+        function: truthy
+
+  IGNITIA004J:
+    description: |
+      IGNITIA004J: paths -> operationId must begin with it's corresponding HTTP verb (GET, POST, PUT, PATCH, DELETE)
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.paths.*"
+    then:
+      - field: delete.operationId
+        function: pattern
+        functionOptions:
+          match: "^Delete.*"
+      - field: get.operationId
+        function: pattern
+        functionOptions:
+          match: "^Get.*"
+      - field: patch.operationId
+        function: pattern
+        functionOptions:
+          match: "^Patch.*"
+      - field: post.operationId
+        function: pattern
+        functionOptions:
+          match: "^Post.*"
+      - field: put.operationId
+        function: pattern
+        functionOptions:
+          match: "^Put.*"
+
+
+  IGNITIA004M:
+    description: |
+      IGNITIA004M: paths -> requestBody must be named as '{operationId}Request':
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.paths[*][*]"
+    then:
+      function: requestBodyNamingPattern
+
+  IGNITIA004N:
+    description: |
+      IGNITIA004N: paths -> parameters must contain XCorrelationId as a header parameter':
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.paths[*][*].parameters"
+    then:
+      function: hasXCorrelationId
+
+  IGNITIA004O:
+    description: |
+      IGNITIA004O: paths -> responses -> HTTP 200 & HTTP 201 must follow the naming pattern: {operationId}Response. 
+      HTTP 201 responses may also be called 'CreatedResponse'
+      HTTP 204 responses may also be called 'NoContentResponse'
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.paths[*][*]"
+    then:
+      function: responseNamingPattern
+
+  IGNITIA004Q:
+    message: "IGNITIA004Q: paths -> responses -> {{error}}"
+    given: "$.paths[*][*].responses"
+    severity: error
+    resolved: false
+    formats: [oas3]
+    then:
+      - field: "400.$ref"
+        function: pattern
+        functionOptions:
+          match: "^#/components/responses/BadRequestResponse$"
+      - field: "401.$ref"
+        function: pattern
+        functionOptions:
+          match: "^#/components/responses/UnauthorizedResponse$"
+      - field: "403.$ref"
+        function: pattern
+        functionOptions:
+          match: "^#/components/responses/ForbiddenResponse$"
+      - field: "404.$ref"
+        function: pattern
+        functionOptions:
+          match: "^#/components/responses/NotFoundResponse$"
+      - field: "409.$ref"
+        function: pattern
+        functionOptions:
+          match: "^#/components/responses/ConflictResponse$"
+      - field: "500.$ref"
+        function: pattern
+        functionOptions:
+          match: "^#/components/responses/InternalServerErrorResponse$"
+      - field: "503.$ref"
+        function: pattern
+        functionOptions:
+          match: "^#/components/responses/ServiceUnavailableResponse$"
+
+  IGNITIA005A:
+    description: |
+      IGNITIA005A: components must be ordered as follows:
+      - securitySchemes (optional)
+      - parameters
+      - requestBodies (optional)
+      - responses
+      - headers
+      - schemas
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.components"
+    then:
+      function: componentOrder
+
+  IGNITIA006A:
+    message: |
+      IGNITIA006A: components -> parameters must be ordered alphabetically.
+      {{error}}
+    severity: error
+    given: "$.components.parameters"
+    then:
+      function: sortedAlphabetically
+
+  IGNITIA006B:
+    description: "IGNITIA006B: The field 'components.parameters.description' must be defined"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.parameters.*
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA006D:
+    description: "IGNITIA006D: components -> parameters with (in == path) should have a required field with true as it's value."
+    given: "$..parameters[?(@.in == 'path')]"
+    severity: error
+    then:
+      - field: required
+        function: defined
+      - field: required
+        function: truthy
+
+  IGNITIA006E:
+    description: "IGNITIA006E: components -> parameters with (style == form) must contain explode: false as well."
+    given: "$..parameters[?(@.style == 'form')]"
+    severity: error
+    then:
+      - field: explode
+        function: defined
+      - field: explode
+        function: falsy
+
+  IGNITIA007A:
+    message: |
+      IGNITIA007A: components -> requestBodies must be ordered alphabetically.
+      {{error}}
+    severity: error
+    given: "$.components.requestBodies"
+    then:
+      function: sortedAlphabetically
+
+  IGNITIA007B:
+    description: "IGNITIA007B: components -> requestBodies must have a description."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.requestBodies.*
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA007D:
+    description: "IGNITIA007D: components -> requestBodies must have a required field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.requestBodies.*
+    then:
+      - field: "required"
+        function: truthy
+
+  IGNITIA008A:
+    message: |
+      IGNITIA008A: components -> responses must be ordered alphabetically.
+      {{error}}
+    severity: error
+    given: "$.components.responses"
+    then:
+      function: sortedAlphabetically
+
+  IGNITIA008B:
+    description: "IGNITIA008B: components -> responses must have a description."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.responses.*
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA008D:
+    description: "IGNITIA008D: components -> responses must x-correlation-id defined as a header"
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.components.responses.*"
+    then:
+      - field: headers
+        function: truthy
+      - field: headers.x-correlation-id
+        function: truthy
+
+  IGNITIA009A:
+    message: |
+      IGNITIA009A: components -> schemas must be ordered alphabetically.
+      {{error}}
+    severity: error
+    given: "$.components.schemas"
+    then:
+      function: sortedAlphabetically
+
+  IGNITIA009B:
+    description: "IGNITIA009B: components -> schemas must have a description."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas.*
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA009C:
+    description: "IGNITIA009C: components -> schemas must have a type field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas.*
+    then:
+      - field: type
+        function: truthy
+
+  IGNITIA009D:
+    description: "IGNITIA009D: components -> schemas with (type == object) must define the additionalProperties field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.type == 'object' && !@.allOf && !@.oneOf)]
+    then:
+      - field: additionalProperties
+        function: defined
+
+  IGNITIA009E:
+    description: "IGNITIA009E: components -> schemas with (type == array) must define the uniqueItems field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.type == 'array')]
+    then:
+      - field: uniqueItems
+        function: defined
+
+  IGNITIA009F:
+    description: |
+      IGNITIA009F: components -> schemas with (type == number) must define the format field with one of the following values:
+      - float
+      - double
+      - decimal
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.properties)].properties.[?(@.$ref == undefined && @.type == 'number')]*
+    then:
+      - field: format
+        function: defined
+      - field: format
+        function: pattern
+        functionOptions:
+          match: "^(float|double|decimal)$"
+
+  IGNITIA009G:
+    description: |
+      IGNITIA009G: components -> schemas with (type == integer) must define the format field with one of the following values:
+      - int32
+      - int64
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.properties)].properties.[?(@.$ref == undefined && @.type == 'integer')]*
+    then:
+      - field: format
+        function: defined
+      - field: format
+        function: pattern
+        functionOptions:
+          match: "^(int32|int64)$"
+
+  IGNITIA009H:
+    description: |
+      IGNITIA009H: components -> schemas 'complex types' (type == object/array) must only contain other (type == object/array) 'complex types' as a reference ($ref)
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.components.schemas[?(@.type == 'object' || @.type == 'array')].properties.*"
+    then:
+      - field: type
+        function: pattern
+        functionOptions:
+          match: "^(?!object$|array$).+$"
+
+  IGNITIA009I:
+    description: |
+      IGNITIA009H: components -> schemas 'complex types' (type == object/array) must only contain enums (type == string, enum:) as a reference ($ref)
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: "$.components.schemas[?(@.type == 'object' || @.type == 'array')].properties.*"
+    then:
+      - field: enum
+        function: falsy
+
+  IGNITIA009J:
+    description: |
+      IGNITIA009J: components -> schemas 'primitive types' must not be defined at the root level
+    severity: error
+    formats: [oas3]
+    given: "$.components.schemas[*]"
+    then:
+      field: type
+      function: pattern
+      functionOptions:
+        match: "^(object|array|string)$"
+
+  IGNITIA009K:
+    description: |
+      IGNITIA009K: components -> schemas may not have inline examples
+    severity: error
+    resolved: false
+    given: "$..properties.*"
+    then:
+      - field: example
+        function: falsy
+
+  IGNITIA009L:
+    description: "IGNITIA009L: components -> schemas with (type == object) must define the properties field in case additionalProperties = false."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.type == 'object' && @.additionalProperties == 'false')]
+    then:
+      - field: properties
+        function: defined
+
+  IGNITIA009M:
+    description: "IGNITIA009M: components -> schemas with (type == array) must define the items field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.type == 'array')]
+    then:
+      - field: items
+        function: defined
+
+  IGNITIA009N:
+    description: "IGNITIA009N: components -> schema properties must define nullable field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.properties)].properties.[?(@.$ref == undefined)]*
+    then:
+      - field: nullable
+        function: defined
+
+  IGNITIA009O:
+    description: "IGNITIA009O: components -> schemas with type == object/array must define nullable field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.$ref == undefined && @.type == 'object' || @.type == 'array')]
+    then:
+      - field: nullable
+        function: defined
+
+  IGNITIA009P:
+    description: "IGNITIA009P: components -> schemas with type == string, enum: must define nullable field."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.schemas[?(@.enum)]
+    then:
+      - field: nullable
+        function: defined
+
+  IGNITIA010A:
+    message: |
+      IGNITIA010A: components -> examples must be ordered alphabetically.
+      {{error}}
+    severity: error
+    given: "$.components.examples"
+    then:
+      function: sortedAlphabetically
+
+  IGNITIA010B:
+    description: "IGNITIA010B: components -> examples must have a description."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.examples.*
+    then:
+      - field: "description"
+        function: truthy
+
+  IGNITIA010C:
+    description: "IGNITIA010C: components -> examples must have the 'value' field defined."
+    severity: error
+    formats: [oas3]
+    resolved: false
+    given: $.components.examples.*
+    then:
+      - field: "value"
+        function: truthy
