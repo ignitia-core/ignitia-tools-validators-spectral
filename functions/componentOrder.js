@@ -43,6 +43,11 @@ export default (input) => {
 
   if (
     inputKeysAsString ===
+    allComponentsWithoutSecuritySchemesAndRequestBodyInputKeysAsString
+  ) {
+    return;
+  }
+
   return [
     {
       message: JSON.stringify([
