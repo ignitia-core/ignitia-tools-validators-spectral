@@ -16,33 +16,19 @@ rules:
   info-contact: true
   info-description: false
   info-license: false
-  info-version: true
-  info-version-semver: true
   license-url: false
   no-$ref-siblings: false
-  no-empty-servers: false
   no-eval-in-markdown: false
-  no-invalid-media-type-examples: true
-  no-path-trailing-slash: false
   no-script-tags-in-markdown: false
-  oas-example-valid-media: true
-  oas-example-value-or-externalValue: false
   oas3-api-servers: false
   oas3-examples-value-or-externalValue: false
   oas3-operation-security-defined: true
   oas3-parameter-description: true
-  oas3-request-body: true
   oas3-schema: true
-  oas3-schema-circular: true
-  oas3-schema-description: false
-  oas3-schema-examples: false
-  oas3-schema-required-properties: true
   oas3-server-not-example.com: false
   oas3-server-trailing-slash: false
   oas3-server-variables: false
   oas3-unused-component: true
-  oas3-unused-example: false
-  oas3-valid-content-example: true
   oas3-valid-media-example: true
   oas3-valid-schema-example: false
   openapi-tags: false
@@ -52,24 +38,14 @@ rules:
   operation-operationId-unique: true
   operation-operationId-valid-in-url: true
   operation-parameters: true
-  operation-security: true
   operation-singular-tag: true
   operation-success-response: true
-  operation-summary: false
   operation-tag-defined: true
   operation-tags: true
-  operation-tags-resolved: true
   path-declarations-must-exist: true
   path-keys-no-trailing-slash: false
   path-not-include-query: false
   path-params: true
-  responses-2xx-schema: true
-  responses-have-description: false
-  schema-invalid-json: true
-  schema-typed-array: true
-  schema-typed-enum: false
-  servers-matches: false
-  tag-described: false
   tag-description: false
   typed-enum: false
 
